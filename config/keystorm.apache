@@ -1,0 +1,125 @@
+<VirtualHost ${APACHE_HOST}:${APACHE_PORT}>
+    # name the server
+    ServerName ${APACHE_SERVER_NAME}
+
+    # enable SSL
+    SSLEngine on
+
+    # for security reasons you may restrict the SSL protocol
+    SSLProtocol all -SSLv2 -SSLv3
+    SSLCipherSuite  ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
+    SSLHonorCipherOrder on
+
+    # this should point to your server host certificate
+    SSLCertificateFile ${APACHE_SSL_CERT}
+
+    # this should point to your server host key
+    SSLCertificateKeyFile ${APACHE_SSL_KEY}
+
+    # directory containing the Root CA certificates and their hashes
+    SSLCACertificatePath ${APACHE_SSL_CA}
+
+    # directory containing CRLs
+    SSLCARevocationPath ${APACHE_SSL_CRL}
+
+    # logging configuration
+    LogLevel ${APACHE_LOG_LEVEL}
+    ErrorLog /var/log/apache-keystorm/error.log
+    CustomLog /var/log/apache-keystorm/access.log common
+
+    # acceptable depth of incoming/client certificate chains
+    SSLVerifyDepth 10
+
+    # set to optional, this tells Apache to attempt to verify SSL certificates if provided
+    # for X.509-only access, set to 'require'
+    SSLVerifyClient optional
+
+    # enable passing of SSL variables to passenger. For GridSite/VOMS, enable also exporting certificate data
+    SSLOptions +StdEnvVars +ExportCertData +LegacyDNStringFormat
+
+    # set proxy headers for local keystorm application
+    RequestHeader set X_FORWARDED_PROTO 'https'
+    RemoteIPHeader X-Forwarded-For
+
+    ######################################################################################
+    ## VOMS Authentication Section
+    ######################################################################################
+
+    # clean external GRST_* headers
+    RequestHeader set GRST_VOMS_FQANS ""
+    RequestHeader set GRST_CRED_0 ""
+    RequestHeader set GRST_CRED_1 ""
+    RequestHeader set GRST_ROBOT_DN ""
+    RequestHeader set SSL_CLIENT_VERIFY ""
+
+    # VOMS/X.509-protected location
+    <Location /v3/OS-FEDERATION/identity_providers/${APACHE_IDENTITY_PROVIDER}/protocols/mapped/auth>
+        # populate ENV variables
+        GridSiteEnvs on
+        # turn off directory listings
+        GridSiteIndexes off
+        # accept GSI proxies from clients
+        GridSiteGSIProxyLimit 4
+        # disable GridSite method extensions
+        GridSiteMethods ""
+
+        Require all granted
+        Options -MultiViews
+
+        RequestHeader set GRST_VOMS_FQANS "%{GRST_VOMS_FQANS}e"
+        RequestHeader set GRST_CRED_0 "%{GRST_CRED_0}e"
+        RequestHeader set GRST_CRED_1 "%{GRST_CRED_1}e"
+        RequestHeader set GRST_ROBOT_DN "%{GRST_ROBOT_DN}e"
+        RequestHeader set SSL_CLIENT_VERIFY "%{SSL_CLIENT_VERIFY}s"
+
+        ProxyPass ${APACHE_PROXY}/v3/auth/federation/voms/
+        ProxyPassReverse ${APACHE_PROXY}/v3/auth/federation/voms/
+    </Location>
+
+    ######################################################################################
+    ## OIDC Authentication Section
+    ######################################################################################
+
+    # OIDC configuration
+    OIDCResponseType "code"
+    OIDCClaimPrefix "OIDC-"
+    OIDCClaimDelimiter ;
+    OIDCScope "openid"
+
+    # OIDC provider-specific configuration
+    OIDCProviderMetadataURL ${APACHE_OIDC_METADATA_URL}
+    OIDCClientID ${APACHE_OIDC_CLIENT_ID}
+    OIDCClientSecret ${APACHE_OIDC_CLIENT_SECRET}
+    OIDCCryptoPassphrase ${APACHE_OIDC_CRYPTO_PASSPHRASE}
+    OIDCRedirectURI ${APACHE_OIDC_REDIRECT_URI}
+
+    # OAuth2 for API access
+    OIDCOAuthIntrospectionEndpoint  ${APACHE_OIDC_INTROSPECTION_ENDPOINT}
+    OIDCOAuthClientID ${APACHE_OIDC_CLIENT_ID}
+    OIDCOAuthClientSecret ${APACHE_OIDC_CLIENT_SECRET}
+
+    # OAuth2-protected location
+    <Location /v3/OS-FEDERATION/identity_providers/${APACHE_IDENTITY_PROVIDER}/protocols/oidc/auth>
+        Authtype oauth20
+        Require  valid-user
+        Options  -MultiViews
+
+        ProxyPass ${APACHE_PROXY}/v3/auth/federation/oidc/
+        ProxyPassReverse ${APACHE_PROXY}/v3/auth/federation/oidc/
+    </Location>
+
+    ######################################################################################
+    ## General Proxy Section
+    ######################################################################################
+
+    # keep original `Host:` content
+    ProxyPreserveHost On
+
+    # YOU SHALL NOT PASS UNAUTHENTICATED
+    ProxyPass "/v3/auth/federation/voms" "!"
+    ProxyPass "/v3/auth/federation/oidc" "!"
+
+    # pass the rest to local keystorm
+    ProxyPass / ${APACHE_PROXY}/
+    ProxyPassReverse / ${APACHE_PROXY}/
+</VirtualHost>

@@ -1,0 +1,56 @@
+{
+  "vos":[
+    {
+      "name":"dteam",
+      "endpoints":[
+        {
+          "name":"voms2.hellasgrid.gr",
+          "dns":[
+            "/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms2.hellasgrid.gr",
+            "/C=GR/O=HellasGrid/OU=Certification Authorities/CN=HellasGrid CA 2016"
+          ]
+        },
+        {
+          "name":"voms.hellasgrid.gr",
+          "dns":[
+            "/C=GR/O=HellasGrid/OU=hellasgrid.gr/CN=voms.hellasgrid.gr",
+            "/C=GR/O=HellasGrid/OU=Certification Authorities/CN=HellasGrid CA 2016"
+          ]
+        }
+      ]
+    },
+    {
+      "name":"ops",
+      "endpoints":[
+        {
+          "name":"lcg-voms2.cern.ch",
+          "dns":[
+            "/DC=ch/DC=cern/OU=computers/CN=lcg-voms2.cern.ch",
+            "/DC=ch/DC=cern/CN=CERN Grid Certification Authority"
+          ]
+        },
+        {
+          "name":"lcg-voms.cern.ch",
+          "dns":[
+            "/DC=ch/DC=cern/OU=computers/CN=lcg-voms.cern.ch",
+            "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority"
+          ]
+        },
+        {
+          "name":"voms2.cern.ch",
+          "dns":[
+            "/DC=ch/DC=cern/OU=computers/CN=voms2.cern.ch",
+            "/DC=ch/DC=cern/CN=CERN Grid Certification Authority"
+          ]
+        },
+        {
+          "name":"voms.cern.ch",
+          "dns":[
+            "/DC=ch/DC=cern/OU=computers/CN=voms.cern.ch",
+            "/DC=ch/DC=cern/CN=CERN Trusted Certification Authority"
+          ]
+        }
+      ]
+    }
+  ]
+}
