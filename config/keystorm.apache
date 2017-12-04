@@ -24,8 +24,8 @@
 
     # logging configuration
     LogLevel ${APACHE_LOG_LEVEL}
-    ErrorLog /var/log/apache-keystorm/error.log
-    CustomLog /var/log/apache-keystorm/access.log common
+    ErrorLog ${APACHE_LOG_ERROR}
+    TransferLog ${APACHE_LOG_ACCESS}
 
     # acceptable depth of incoming/client certificate chains
     SSLVerifyDepth 10

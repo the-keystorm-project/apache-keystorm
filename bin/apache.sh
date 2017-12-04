@@ -52,6 +52,8 @@ function configure_apache {
   export APACHE_SSL_CA="${APACHE_SSL_CA:-/etc/grid-security/certificates}"
   export APACHE_SSL_CRL="${APACHE_SSL_CRL:-/etc/grid-security/certificates}"
   export APACHE_LOG_LEVEL="${APACHE_LOG_LEVEL:-info}"
+  export APACHE_LOG_ACCESS="${APACHE_LOG_ACCESS:-/var/log/apache-keystorm/access.log}"
+  export APACHE_LOG_ERROR="${APACHE_LOG_ERROR:-/var/log/apache-keystorm/error.log}"
   export APACHE_SERVER_NAME="${APACHE_SERVER_NAME:-localhost}"
   export APACHE_IDENTITY_PROVIDER="${APACHE_IDENTITY_PROVIDER:-egi.eu}"
   export APACHE_PROXY="${APACHE_PROXY:-http://127.0.0.1:3000}"
