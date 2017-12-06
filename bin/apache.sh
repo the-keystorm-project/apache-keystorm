@@ -17,10 +17,6 @@ function configure_apache {
     missing_var_exit "APACHE_OIDC_REDIRECT_URI"
   fi
 
-  if [ -z ${APACHE_OIDC_REDIRECT_LOCATION+x} ]; then
-    missing_var_exit "APACHE_OIDC_REDIRECT_LOCATION"
-  fi
-
   if [ -z ${APACHE_OIDC_CLIENT_SECRET+x} ] && [ -z ${APACHE_OIDC_CLIENT_SECRET_FILE+x} ]; then
     missing_var_exit "APACHE_OIDC_CLIENT_SECRET_FILE"
   fi

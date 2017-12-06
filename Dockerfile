@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 ARG branch=master
 ARG version
 
-ENV name="apache-keystorm"
+ENV name="apache-occi"
 ENV logDir="/var/log/${name}" \
     TERM="xterm"
 
@@ -46,11 +46,11 @@ RUN a2dissite 000-default && \
     a2enmod auth_openidc && \
     a2enmod sslgridsite
 
-COPY config/* /keystorm/config/
-COPY bin/* /keystorm/bin/
+COPY config/* /${name}/config/
+COPY bin/* /${name}/bin/
 
 VOLUME ["${logDir}"]
 
 EXPOSE 5000
 
-ENTRYPOINT ["/keystorm/bin/keystorm.sh"]
+ENTRYPOINT ["/apache-occi/bin/apache-occi-wrapper.sh"]
