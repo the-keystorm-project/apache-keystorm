@@ -54,7 +54,7 @@ function configure_apache {
   export APACHE_IDENTITY_PROVIDER="${APACHE_IDENTITY_PROVIDER:-egi.eu}"
   export APACHE_PROXY="${APACHE_PROXY:-http://127.0.0.1:3000}"
 
-  envsubst < /keystorm/config/keystorm.apache > /etc/apache2/sites-available/keystorm.conf
+  envsubst < /apache-occi/config/keystorm.apache > /etc/apache2/sites-available/keystorm.conf
   if [ ${DEBUG} == "1" ]; then
     cat /etc/apache2/sites-available/keystorm.conf
   fi
