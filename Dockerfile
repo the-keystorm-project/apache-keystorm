@@ -3,12 +3,12 @@ FROM ubuntu:16.04
 ARG branch=master
 ARG version
 
-ENV name="apache-occi"
+ENV name="apache-keystorm"
 ENV logDir="/var/log/${name}" \
     TERM="xterm"
 
 LABEL application=${name} \
-      description="Apache server for use with keystorm" \
+      description="Apache server for use with Keystorm" \
       maintainer="kimle@cesnet.cz" \
       version=${version} \
       branch=${branch}
@@ -53,4 +53,4 @@ VOLUME ["${logDir}"]
 
 EXPOSE 5000
 
-ENTRYPOINT ["/apache-occi/bin/apache-occi-wrapper.sh"]
+ENTRYPOINT ["/apache-keystorm/bin/apache-keystorm-wrapper.sh"]
