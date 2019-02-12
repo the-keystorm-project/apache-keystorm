@@ -1,40 +1,40 @@
 source $(dirname $0)/common.sh
 
 function configure_apache {
-  if [ -z ${APACHE_OIDC_METADATA_URL+x} ]; then
+  if [ -z ${APACHE_OIDC_METADATA_URL:+x} ]; then
     missing_var_exit "APACHE_OIDC_METADATA_URL"
   fi
 
-  if [ -z ${APACHE_OIDC_CLIENT_ID+x} ]; then
+  if [ -z ${APACHE_OIDC_CLIENT_ID:+x} ]; then
     missing_var_exit "APACHE_OIDC_CLIENT_ID"
   fi
 
-  if [ -z ${APACHE_OIDC_INTROSPECTION_ENDPOINT+x} ]; then
+  if [ -z ${APACHE_OIDC_INTROSPECTION_ENDPOINT:+x} ]; then
     missing_var_exit "APACHE_OIDC_INTROSPECTION_ENDPOINT"
   fi
 
-  if [ -z ${APACHE_OIDC_REDIRECT_URI+x} ]; then
+  if [ -z ${APACHE_OIDC_REDIRECT_URI:+x} ]; then
     missing_var_exit "APACHE_OIDC_REDIRECT_URI"
   fi
 
-  if [ -z ${APACHE_OIDC_CLIENT_SECRET+x} ] && [ -z ${APACHE_OIDC_CLIENT_SECRET_FILE+x} ]; then
+  if [ -z ${APACHE_OIDC_CLIENT_SECRET:+x} ] && [ -z ${APACHE_OIDC_CLIENT_SECRET_FILE:+x} ]; then
     missing_var_exit "APACHE_OIDC_CLIENT_SECRET_FILE"
   fi
 
-  if [ ${APACHE_OIDC_CLIENT_SECRET_FILE+x} ]; then
-    if [ ${APACHE_OIDC_CLIENT_SECRET+x} ]; then
+  if [ ${APACHE_OIDC_CLIENT_SECRET_FILE:+x} ]; then
+    if [ ${APACHE_OIDC_CLIENT_SECRET:+x} ]; then
       error_exit "Variables 'APACHE_OIDC_CLIENT_SECRET' and 'APACHE_OIDC_CLIENT_SECRET_FILE' cannot be set togather" 2
     fi
 
     export APACHE_OIDC_CLIENT_SECRET=$(cat ${APACHE_OIDC_CLIENT_SECRET_FILE})
   fi
 
-  if [ -z ${APACHE_OIDC_CRYPTO_PASSPHRASE+x} ] && [ -z ${APACHE_OIDC_CRYPTO_PASSPHRASE_FILE+x} ]; then
+  if [ -z ${APACHE_OIDC_CRYPTO_PASSPHRASE:+x} ] && [ -z ${APACHE_OIDC_CRYPTO_PASSPHRASE_FILE:+x} ]; then
     missing_var_exit "APACHE_OIDC_CRYPTO_PASSPHRASE_FILE"
   fi
 
-  if [ ${APACHE_OIDC_CRYPTO_PASSPHRASE_FILE+x} ]; then
-    if [ ${APACHE_OIDC_CRYPTO_PASSPHRASE+x} ]; then
+  if [ ${APACHE_OIDC_CRYPTO_PASSPHRASE_FILE:+x} ]; then
+    if [ ${APACHE_OIDC_CRYPTO_PASSPHRASE:+x} ]; then
       error_exit "Variables 'APACHE_OIDC_CRYPTO_PASSPHRASE' and 'APACHE_OIDC_CRYPTO_PASSPHRASE_FILE' cannot be set togather" 2
     fi
 
@@ -55,7 +55,7 @@ function configure_apache {
   export APACHE_PROXY="${APACHE_PROXY:-http://127.0.0.1:3000}"
 
   envsubst < /apache-keystorm/config/keystorm.apache > /etc/apache2/sites-available/keystorm.conf
-  if [ ${DEBUG} == "1" ]; then
+  if [ ${DEBUG:+x} ]; then
     cat /etc/apache2/sites-available/keystorm.conf
   fi
 
